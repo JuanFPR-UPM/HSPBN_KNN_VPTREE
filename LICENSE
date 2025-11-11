@@ -1,0 +1,29 @@
+MIT License
+
+Copyright (c) 2020 David Atienza  
+Copyright (c) 2024 Barcelona Supercomputing Center - Centro Nacional de Supercomputación (BSC) & Aingura IIoT  
+Copyright (c) 2025 Juan Fernández del Pozo Romero
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+### Provenance
+This code is based on:
+1. The original work (https://github.com/davenza/PyBNesian) authored by David Atienza, licensed under the MIT License. The modifications have been made in accordance with MIT license, under which the original work was licensed.
+2. The extended version by Barcelona Supercomputing Center - Centro Nacional de Supercomputación (BSC) and Aingura IIoT, also under the MIT License, with authors:
+    - Erik Blázquez erik.blazquez@bsc.es
+    - Gaizka Virumbrales gvirumbrales@ainguraiiot.com
+    - Filippo Mantovani filippo.mantovani@bsc.es
+    - Javier Diaz jdiaz@ainguraiiot.com
+
+This repository contains further modifications and extensions developed in 2025 by:
+
+- Juan Fernández del Pozo Romero j.fernandezdelpozo@upm.es
