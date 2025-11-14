@@ -125,6 +125,9 @@ The recommended and working environments for the experiments in the paper have b
 * A second Python 3.13.5 installation for everything else.
 * R version 4.5.1 and latest Java LTS release JDK-25.
 
+### Dataset availability
+Although all datasets are either publicly available or reproducible, we provide all the experimental data and learned models as they may take some time to be generated. They can be downloaded as a .zip file [here](https://cig.fi.upm.es/wp-content/uploads/experiments.zip), and must be decompressed under the [experiments/](/experiments) directory of this project.
+
 ## Author
 
     - Juan Fernández del Pozo Romero j.fernandezdelpozo@upm.es
