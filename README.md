@@ -4,7 +4,7 @@ This repository contains the code and experiments for the paper:
 
 "*Constraint-based learning of hybrid semi-parametric Bayesian networks*",
 
-which has been submitted to [Information Sciences (Elsevier)](https://www.sciencedirect.com/journal/information-sciences).
+which is currently under review at [Information Sciences (Elsevier)](https://track.authorhub.elsevier.com/?uuid=3faa3927-e6ec-4e92-bef1-7404a47eb2b3).
 
 Additionally, it contains the implementation of ${k}\text{NNCIT}$: a non-parametric permutation test of conditional independence based on $\text{MS}_{0\text{-}\mathcal{\infty}}$ [1], and accelerated with VP-trees [2] and moment matching.
 
