@@ -13,7 +13,10 @@ from adapted_MMCIT import MMCIT
 from adapted_CGIT import CGIT
 from adapted_DGCIT import DGCIT
 # from adapted_LCIT import Adapted_LCIT
-from adapted_MRCIT import MRCIT
+# from adapted_MRCIT import MRCIT
+from adapted_Pillai import Pillai
+from adapted_CIml import Adapted_CIml
+from adapted_CCI import CCI
 
 try:
     os.mkdir('./results/')
@@ -56,6 +59,21 @@ except:
     pass
 
 try:
+    os.mkdir('./results/synthetic/pillai')
+except:
+    pass
+
+try:
+    os.mkdir('./results/synthetic/ciml')
+except:
+    pass
+
+try:
+    os.mkdir('./results/synthetic/cci')
+except:
+    pass
+
+try:
     os.mkdir('./results/synthetic/hillclimbing')
 except:
     pass
@@ -81,18 +99,21 @@ def preprocess_dataset(filename):
     return df, node_children_blacklist
 
 indep_test_dict = {
-    'knncit': partial(
-        pbn.MixedKMutualInformation,
-        shuffle_neighbors=5,
-        samples=100,
-        scaling="normalized_rank",
-        gamma_approx=True,
-        adaptive_k=True
-    ),
-    'mrcit': partial(MRCIT, num_f2=20),
-    'cgit': CGIT,
-    'dgcit': DGCIT,
-    'mmcit': MMCIT,
+    # 'knncit': partial(
+    #     pbn.MixedKMutualInformation,
+    #     shuffle_neighbors=5,
+    #     samples=100,
+    #     scaling="normalized_rank",
+    #     gamma_approx=True,
+    #     adaptive_k=True
+    # ),
+    # 'mrcit': partial(MRCIT, num_f2=20),
+    # 'cgit': CGIT,
+    # 'dgcit': DGCIT,
+    # 'mmcit': MMCIT,
+    'pillai':Pillai,
+    'ciml':Adapted_CIml,
+    'cci':partial(CCI, nperm=200),
     # 'lcit': partial(Adapted_LCIT, n_components=32, hidden_sizes=[4]),
 }
 
@@ -128,10 +149,14 @@ def learn_pdags_pc(filename, counter):
             continue
         print(counter, f'{indep_test_name}: processing file', filename)
 
-        if indep_test_name != 'knncit':
+        if indep_test_name not in ['knncit', 'cci']:
             indep_test = indep_test_dict[indep_test_name](df=df)
-        else:
+        elif indep_test_name == 'knncit':
             indep_test = indep_test_dict[indep_test_name](df=df, k=len(df)//10)
+        else:
+            kde_ratio = filename.split('_')[3].replace('p','.')
+            parametric = (kde_ratio == '0.0')
+            indep_test = indep_test_dict[indep_test_name](df=df, parametric=parametric)
         pdag = pbn.PC().estimate(hypot_test=indep_test, alpha=0.05, allow_bidirected=False, arc_blacklist = node_children_blacklist, arc_whitelist = [], edge_blacklist = [], edge_whitelist = [], verbose = 1)
 
         with open(f'./results/synthetic/{indep_test_name}/'+filename[:-4]+'.pkl', "wb") as f:
@@ -144,6 +169,8 @@ filenames = sorted(
     if os.path.isfile(os.path.join(directory, f))
 )
 for i, filename in enumerate(filenames):
-    learn_bn_hillclimbing(os.fsdecode(filename), i)
+    # learn_bn_hillclimbing(os.fsdecode(filename), i)
+    if os.fsdecode(filename).split('_')[5].split('.')[0] != '3000':
+        continue
     learn_pdags_pc(os.fsdecode(filename), i)
 
