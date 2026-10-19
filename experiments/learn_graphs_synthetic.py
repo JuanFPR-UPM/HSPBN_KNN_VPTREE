@@ -149,14 +149,10 @@ def learn_pdags_pc(filename, counter):
             continue
         print(counter, f'{indep_test_name}: processing file', filename)
 
-        if indep_test_name not in ['knncit', 'cci']:
+        if indep_test_name != 'knncit':
             indep_test = indep_test_dict[indep_test_name](df=df)
-        elif indep_test_name == 'knncit':
-            indep_test = indep_test_dict[indep_test_name](df=df, k=len(df)//10)
         else:
-            kde_ratio = filename.split('_')[3].replace('p','.')
-            parametric = (kde_ratio == '0.0')
-            indep_test = indep_test_dict[indep_test_name](df=df, parametric=parametric)
+            indep_test = indep_test_dict[indep_test_name](df=df, k=len(df)//10)
         pdag = pbn.PC().estimate(hypot_test=indep_test, alpha=0.05, allow_bidirected=False, arc_blacklist = node_children_blacklist, arc_whitelist = [], edge_blacklist = [], edge_whitelist = [], verbose = 1)
 
         with open(f'./results/synthetic/{indep_test_name}/'+filename[:-4]+'.pkl', "wb") as f:
