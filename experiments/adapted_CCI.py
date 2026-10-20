@@ -83,5 +83,21 @@ class CCI(IndependenceTest):
         )
 
         # Execute the R code and extract the float p-value
-        pval = ro.r(r_command)[0]
+        try:
+            pval = ro.r(r_command)[0]
+        except Exception as e:
+            # Catch the specific zero standard deviation crash from R
+            if "zero standard deviation" in str(e):
+                # Fallback to empirical p-value (parametric = FALSE)
+                fallback_command = (
+                    f"CCI.test(formula = as.formula('{formula_str}'), "
+                    f"data = df_r, "
+                    f"p = {self.p}, "
+                    f"nperm = {self.nperm}, "
+                    f"parametric = FALSE, "  # OVERRIDE HERE
+                    f"method = '{self.method}', "
+                    f"metric = '{self.metric}', "
+                    f"robust = {self.robust})$p.value"
+                )
+                pval = ro.r(fallback_command)[0]
         return pval

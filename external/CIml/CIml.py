@@ -38,7 +38,6 @@ def evaluate_performance(y_true, y_pred, metric):
 
 def decide_split(Y_, classification):
     """Decides Cross-Validation strategy based on sample size."""
-
     if Y_.shape[0] <= 1000:
         if classification:
             kf_ = StratifiedKFold(n_splits=10,  shuffle=True)
@@ -46,9 +45,6 @@ def decide_split(Y_, classification):
         else:
             kf_ = KFold(n_splits=10,  shuffle=True)
             indices = list(kf_.split(Y_))
-
-        pred_methods = ['XGB', 'LR', 'SVM']
-
     else:
         if classification:
             kf_ = StratifiedKFold(n_splits=5,  shuffle=True)
@@ -57,8 +53,9 @@ def decide_split(Y_, classification):
             kf_ = KFold(n_splits=5,  shuffle=True)
             indices = list(kf_.split(Y_))
 
-        pred_methods = ['XGB', 'LR']
-
+    # Always drop SVM, just use XGB and LR
+    pred_methods = ['XGB', 'LR']
+    
     return indices, pred_methods
 
 
@@ -116,27 +113,19 @@ def get_pred_configs(task_type, pred_methods):
 
         if method == 'XGB':
             if task_type == 'regression':
-                for rate in [0.01, 0.05, 0.1, 0.2]:
-                    for depth in [3,4,5]:
+                for rate in [0.1]:
+                    for depth in [3,5]:
                         models.append(XGBRegressor(learning_rate=rate, max_depth=depth, n_jobs=1))
                 models.append(XGBRegressor())
             else:
-                for rate in [0.01, 0.05, 0.1, 0.2]:
-                    for depth in [3,4,5]:
+                for rate in [0.1]:
+                    for depth in [3,5]:
                         models.append(XGBClassifier(learning_rate=rate, max_depth=depth, n_jobs=1))
                 models.append(XGBClassifier())
 
         elif method == 'LR':
             if task_type == 'regression':
                 models.append(LinearRegression(n_jobs=1))
-
-        elif method == 'SVM':
-            for kernel in ['rbf', 'poly']:
-                for gamma_ in [0.001, 0.01]:
-                    if task_type == 'regression':
-                        models.append(SVR(kernel=kernel, C=1, gamma=gamma_, epsilon=0.05, shrinking=False))
-                    else:
-                        models.append(SVC(kernel=kernel, C=1, gamma=gamma_, shrinking=False, probability=True))
 
     return models
 
@@ -241,30 +230,20 @@ def create_pipelines(XZ,  task_type, scaling_methods, scaling_methods_cat, pred_
     transformations = get_scale_configs(continuous_features, categorical_features, scaling_methods, scaling_methods_cat)
     models = get_pred_configs(task_type, pred_methods)
     pipelines = []
-    simple_scalers = (StandardScaler, MinMaxScaler)
+    simple_scalers = (StandardScaler, MinMaxScaler, PowerTransformer)
     none_scaler = (FunctionTransformer,)
 
     xgb_types = (XGBClassifier, XGBRegressor)
-    svm_types = (SVR, SVC)
     for ct_ in transformations:
         for model in models:
             is_xgb = isinstance(model, xgb_types)
-            is_svm = isinstance(model, svm_types)
 
             has_simple_scaler = any(
                 isinstance(trans_tuple[1], simple_scalers)
                 for trans_tuple in ct_.transformers
             )
 
-            has_none_scaler = any(
-                isinstance(trans_tuple[1], none_scaler)
-                for trans_tuple in ct_.transformers
-            )
-
             if is_xgb and has_simple_scaler:
-                continue
-
-            if is_svm and has_none_scaler:
                 continue
 
             pipelines.append(Pipeline(steps=[('prep', ct_), ('pred', model)]))
@@ -301,7 +280,8 @@ def CIml(X_np, Y_np, Z_np,  **params):
 
     # params
     S = params.get('S', 1000)
-    scaling_methods = params.get('scaling', ['none', 'std', 'power'])
+    # scaling_methods = params.get('scaling', ['none', 'std', 'power'])
+    scaling_methods = params.get('scaling', ['none', 'std'])
     scaling_methods_cat = params.get('scaling_cat', ['onehot'])
 
     # Data Preparation

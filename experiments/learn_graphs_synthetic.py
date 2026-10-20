@@ -4,19 +4,19 @@
 import warnings
 warnings.filterwarnings("ignore")
 import os
-os.environ["OMP_NUM_THREADS"] = '1'
 import pandas as pd
 import pickle
 import pybnesian as pbn
 from functools import partial
-from adapted_MMCIT import MMCIT
-from adapted_CGIT import CGIT
-from adapted_DGCIT import DGCIT
+# from adapted_MMCIT import MMCIT
+# from adapted_CGIT import CGIT
+# from adapted_DGCIT import DGCIT
 # from adapted_LCIT import Adapted_LCIT
 # from adapted_MRCIT import MRCIT
 from adapted_Pillai import Pillai
 from adapted_CIml import Adapted_CIml
 from adapted_CCI import CCI
+import random
 
 try:
     os.mkdir('./results/')
@@ -164,9 +164,12 @@ filenames = sorted(
     f for f in os.listdir(directory)
     if os.path.isfile(os.path.join(directory, f))
 )
+
+random.shuffle(filenames)
+
 for i, filename in enumerate(filenames):
     # learn_bn_hillclimbing(os.fsdecode(filename), i)
-    if os.fsdecode(filename).split('_')[5].split('.')[0] != '3000':
-        continue
+    # if os.fsdecode(filename).split('_')[5].split('.')[0] != '3000':
+    #     continue
     learn_pdags_pc(os.fsdecode(filename), i)
 

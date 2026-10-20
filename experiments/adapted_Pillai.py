@@ -29,6 +29,6 @@ class Pillai(IndependenceTest):
 
     def pvalue(self, x, y, z):
 
-        z = [str(col) for col in z] if z is not None else []
+        z = list(set([str(col) for col in z])) if z is not None else []
       
-        return pillai_trace(x, y, z, self.df, boolean=False, kwargs={'seed':self.seed})[1]
+        return pillai_trace(x, y, z, self.df, boolean=False, seed=self.seed)[1]
