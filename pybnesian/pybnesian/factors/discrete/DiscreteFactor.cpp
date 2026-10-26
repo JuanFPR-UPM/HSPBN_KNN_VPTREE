@@ -246,7 +246,7 @@ std::string DiscreteFactor::ToString() const {
                 }
 
                 for (auto i = 0; i < m_cardinality(0); ++i) {
-                    table << std::exp(m_logprob(index + i));
+                    table << std::exp(m_logprob.coeff(index + i));
                 }
                 table << fort::endr;
             }

@@ -1,11 +1,19 @@
-from distutils import log
+import os
+# Undo conda's overly-conservative -march=nocona
+for var in ("CFLAGS", "CXXFLAGS"):
+    if var in os.environ:
+        os.environ[var] = os.environ[var].replace("-march=nocona", "")
+# Force -O3 (conda sets -O2) and native tuning
+os.environ["CFLAGS"]   = os.environ.get("CFLAGS",   "") + " -O3 -march=native -DNDEBUG"
+os.environ["CXXFLAGS"] = os.environ.get("CXXFLAGS", "") + " -O3 -march=native -DNDEBUG"
+
+from setuptools._distutils import log
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.build_clib import build_clib
 import subprocess
 import sys
 import setuptools
-import os
 
 # Enable ccache for faster compilation
 # os.environ['CC'] = 'ccache gcc'
@@ -73,7 +81,9 @@ class Build_CMakeExternalLibrary(build_clib):
             os.chdir(build_directory)
             # Run CMake
             subprocess.check_call(
-                ["cmake", "-DCMAKE_INSTALL_PREFIX=" + os.path.relpath(install_directory, build_directory)] +
+                ["cmake",
+                 "-DCMAKE_BUILD_TYPE=Release",
+                 "-DCMAKE_INSTALL_PREFIX=" + os.path.relpath(install_directory, build_directory)] +
                 cmake_config.cmake_flags + [os.path.join(current_dir, cmake_config.cmake_folder)]
             )
             os.chdir(current_dir)
@@ -196,7 +206,7 @@ def has_flag(compiler, flagname):
         f.write('int main (int argc, char **argv) { return 0; }')
         try:
             compiler.compile([f.name], extra_postargs=[flagname])
-        except setuptools.distutils.errors.CompileError:
+        except Exception:
             return False
     return True
 
@@ -208,19 +218,19 @@ class BuildExt(build_ext):
         import numpy as np
 
         c_opts = {
-            'msvc': ['/EHsc', "/std:c++17", "/Zc:__cplusplus", "/experimental:external", "/external:W0",
+            'msvc': ['/EHsc', "/std:c++20", "/Zc:__cplusplus", "/experimental:external", "/external:W0",
                     "/external:I" + pa.get_include(),
                     "/external:I" + np.get_include(),
-                    "/external:Ilib\\eigen-3.3.7",
+                    "/external:Ilib\\eigen-3.4.1",
                     "/external:Ilib\\boost",
                     "/external:Ilib\\indicators",
                     # Windows creates a build_temp/Release/pybnesian folder structure, so apply a dirname
                     "/external:I" + os.path.join(os.path.dirname(self.build_temp), 'nlopt', 'include'),
                     "-DNOGDI"],
-            'unix': ["-std=c++17",
+            'unix': ["-std=c++20",
                     "-isystem" + pa.get_include(),
                     "-isystem" + np.get_include(),
-                    "-isystemlib/eigen-3.3.7",
+                    "-isystemlib/eigen-3.4.1",
                     "-isystemlib/boost",
                     "-isystemlib/indicators",
                     # Unix creates a build_temp/pybnesian folder structure.
@@ -288,7 +298,7 @@ class BuildExt(build_ext):
             "directory": "{0}",
             "file": "{1}",
             "output": "{2}",
-            "arguments": ["/usr/lib/llvm-11/bin/clang", "-xc++", "{1}", "-Wno-unused-result", "-Wsign-compare", "-D", "NDEBUG", "-g", "-fwrapv", "-O2", "-Wall", "-g", "-fstack-protector-strong", "-Wformat", "-Werror=format-security", "-g", "-fwrapv", "-O2", "-g", "-fstack-protector-strong", "-Wformat", "-Werror=format-security", "-Wdate-time", "-D", "_FORTIFY_SOURCE=2", "-fPIC", "-D", "VERSION_INFO={3}", "-I", "{4}", "-I", "pybnesian/", "-I", "lib/libfort", "-I", "{5}", "-c", "-o", "{6}", "-std=c++17", "-isystem", "{6}", "-isystem", "{7}", "-isystem", "lib/eigen-3.3.7", "-isystem", "-isystem", "lib/boost", "-isystem", "lib/indicators", "-D", "-fdiagnostics-color=always", "-Wall", "-Wextra", "-fvisibility=hidden", "--target=x86_64-pc-linux-gnu"]
+            "arguments": ["/usr/lib/llvm-11/bin/clang", "-xc++", "{1}", "-Wno-unused-result", "-Wsign-compare", "-D", "NDEBUG", "-g", "-fwrapv", "-O2", "-Wall", "-g", "-fstack-protector-strong", "-Wformat", "-Werror=format-security", "-g", "-fwrapv", "-O2", "-g", "-fstack-protector-strong", "-Wformat", "-Werror=format-security", "-Wdate-time", "-D", "_FORTIFY_SOURCE=2", "-fPIC", "-D", "VERSION_INFO={3}", "-I", "{4}", "-I", "pybnesian/", "-I", "lib/libfort", "-I", "{5}", "-c", "-o", "{6}", "-std=c++20", "-isystem", "{6}", "-isystem", "{7}", "-isystem", "lib/eigen-3.4.1", "-isystem", "-isystem", "lib/boost", "-isystem", "lib/indicators", "-D", "-fdiagnostics-color=always", "-Wall", "-Wextra", "-fvisibility=hidden", "--target=x86_64-pc-linux-gnu"]
         }}"""
         conf_files = []
 
@@ -365,10 +375,17 @@ class BuildExt(build_ext):
             opts.append("-Wextra")
             if has_flag(self.compiler, '-fvisibility=hidden'):
                 opts.append('-fvisibility=hidden')
+            opts.append("-O3")
+            opts.append("-DNDEBUG")
+            opts.append("-march=native")
+            opts.append("-mtune=native")
 
         for ext in self.extensions:
             ext.extra_compile_args.extend(opts)
             ext.extra_link_args.extend(link_opts)
+            ext.extra_compile_args.append("-O3")
+            ext.extra_compile_args.append("-march=native")
+            ext.extra_compile_args.append("-DNDEBUG")
 
         # https://stackoverflow.com/questions/37752901/dylib-built-on-ci-cant-be-loaded
         # Create the RPATH for MacOSX
@@ -392,6 +409,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 
 from pybind11.setup_helpers import ParallelCompile, naive_recompile
+os.environ.setdefault("NPY_NUM_BUILD_JOBS", f"{int(os.environ.get("NPY_NUM_BUILD_JOBS", max(1, os.cpu_count() // 2)))}")
 ParallelCompile("NPY_NUM_BUILD_JOBS", needs_recompile=naive_recompile).install()
 
 
