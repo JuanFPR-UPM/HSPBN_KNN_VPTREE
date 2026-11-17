@@ -1,0 +1,13 @@
+# Provenance
+
+This code is based on:
+1. The original work (https://github.com/davenza/PyBNesian) authored by David Atienza, licensed under the MIT License. The modifications have been made in accordance with MIT license, under which the original work was licensed.
+2. The extended version by Barcelona Supercomputing Center - Centro Nacional de Supercomputación (BSC) and Aingura IIoT, also under the MIT License, with authors:
+    - Erik Blázquez erik.blazquez@bsc.es
+    - Gaizka Virumbrales gvirumbrales@ainguraiiot.com
+    - Filippo Mantovani filippo.mantovani@bsc.es
+    - Javier Diaz jdiaz@ainguraiiot.com
+
+This repository contains further modifications and extensions developed in 2026 by:
+
+- Juan Fernández del Pozo Romero j.fernandezdelpozo@upm.es

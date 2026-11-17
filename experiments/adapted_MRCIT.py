@@ -91,6 +91,12 @@ class MRCIT(IndependenceTest):
 
     def pvalue(self, x, y, z):
 
+        if z is not None and len(z) > 0:
+            if isinstance(z, str):
+                z = [z]
+        else:
+            z = []
+
         # assuming column names are encoded to integers
-        z = [int(col) for col in z] if z is not None else []
+        z = [int(col) for col in z] if len(z) > 0 else []
         return self.test.fit(int(x), int(y), z)

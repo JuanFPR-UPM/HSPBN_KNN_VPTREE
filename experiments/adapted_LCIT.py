@@ -34,12 +34,17 @@ class Adapted_LCIT(IndependenceTest):
 
     def pvalue(self, x, y, z):
 
-        z = [str(col) for col in z] if z is not None else []
-        z_series = self.df[z].values
+        if z is not None and len(z) > 0:
+            if isinstance(z, str):
+                z = [z]
+        else:
+            z = []
+            
+        z_series = self.df[z]
         batch_norm = True
         # if Z is empty, force unconditional independece test against a constant value
-        if z_series.size == 0:
-            z_series = np.ones(len(self.df))
+        if z_series.empty:
+            z_series = pd.DataFrame(np.ones((len(self.df), 1)), columns=['dummy_z'])
             batch_norm = False
 
-        return LCIT(self.df[str(x)].values, self.df[str(y)].values, z_series, n_components=self.n_components, hidden_sizes=self.hidden_sizes, normalize=True, batch_norm=batch_norm)
+        return LCIT(self.df[str(x)], self.df[str(y)], z_series, n_components=self.n_components, hidden_sizes=self.hidden_sizes, normalize=True, batch_norm=batch_norm, gpus=1)

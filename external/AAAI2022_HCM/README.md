@@ -8,7 +8,7 @@
     - Require R >= 3.6.3
     - Run following code in the R Console
     
-    ```install.packages("/ossfs/workspace/pai-algo-dev/momentchi2_0.1.5.tar", repos=NULL, type="source")```
+    ```install.packages("momentchi2")```
  
 2. Install required python packages
 

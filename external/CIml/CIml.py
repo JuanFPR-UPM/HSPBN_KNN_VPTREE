@@ -72,8 +72,8 @@ def get_scale_configs(continuous_features, categorical_features,  scaling_method
     }
 
     scaler_map_cat = {
-        'onehot': OneHotEncoder,
-        'ordinal': OrdinalEncoder
+        'onehot': lambda: OneHotEncoder(handle_unknown='ignore'),
+        'ordinal': lambda: OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
     }
 
     methods_con = scaling_methods_con if len(continuous_features)>0 else [None]
@@ -280,6 +280,7 @@ def CIml(X_np, Y_np, Z_np,  **params):
 
     # params
     S = params.get('S', 1000)
+    # S = params.get('S', 100) # For timings benchmark
     # scaling_methods = params.get('scaling', ['none', 'std', 'power'])
     scaling_methods = params.get('scaling', ['none', 'std'])
     scaling_methods_cat = params.get('scaling_cat', ['onehot'])

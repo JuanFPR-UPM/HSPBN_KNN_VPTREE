@@ -39,7 +39,12 @@ class Adapted_CIml(IndependenceTest):
 
     def pvalue(self, x, y, z):
 
-        z = [str(col) for col in z] if z is not None else []
+        if z is not None and len(z) > 0:
+            if isinstance(z, str):
+                z = [z]
+        else:
+            z = []
+            
         z_series = self.df[z].values
         
         if z_series.size == 0:

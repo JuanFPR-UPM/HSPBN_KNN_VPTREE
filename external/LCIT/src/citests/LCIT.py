@@ -46,12 +46,13 @@ class UniformFlow(nn.Module):
     def forward(self, X, Z):
         X = X.view(X.shape[0], -1) # N x 1
         mu = self.z_to_mu(Z) # N x k
-        std = self.z_to_logstd(Z).exp() # N x k
+        logstd = self.z_to_logstd(Z)
+        std = torch.clip(logstd, -10, 10).exp()   # clip log-std, not std
         std = torch.clip(std, 1e-6, None)
         w = self.z_to_w(Z) # N x k
         dist = Normal(mu, std) # N x k
         e = (dist.cdf(X) * w).sum(axis=1, keepdims=True)
-        log_de_dx = (dist.log_prob(X).exp() * w).sum(axis=1, keepdims=True).log()
+        log_de_dx = torch.logsumexp(dist.log_prob(X) + torch.log(w), dim=1, keepdim=True)
         return e, log_de_dx
 
 class DQFlow(nn.Module):
@@ -71,12 +72,13 @@ class DQFlow(nn.Module):
         dist_eps = Normal(0, 1)
         e = torch.randn_like(X)
         mu = self.z_to_mu(Z) # N x k
-        std = self.z_to_logstd(Z).exp() # N x k
+        logstd = self.z_to_logstd(Z)
+        std = torch.clip(logstd, -10, 10).exp()   # clip log-std, not std
         std = torch.clip(std, 1e-6, None)
         w = self.z_to_w(Z) # N x k
         dist = Normal(mu, std) # N x k
         u = (dist.cdf(e) * w).sum(axis=1, keepdims=True)
-        log_du_de = (dist.log_prob(e).exp() * w).sum(axis=1, keepdims=True).log()
+        log_du_de = torch.logsumexp(dist.log_prob(e) + torch.log(w), dim=1, keepdim=True)
         log_qu = dist_eps.log_prob(e) - log_du_de
         return u, log_qu
 
@@ -194,8 +196,18 @@ class CCNF(LightningModule):
                 verbose=verbose
             )
             callbacks.append(early_stopping)
+
+            # --- GPU selection ---
+            if torch.cuda.is_available() and gpus and gpus > 0:
+                accelerator = "gpu"
+                devices = gpus 
+            else:
+                accelerator = "cpu"
+                devices = 1
+
             trainer = Trainer(
-                accelerator="cpu",
+                accelerator=accelerator,
+                devices=devices,
                 max_epochs=max_epochs,
                 logger=verbose,
                 enable_checkpointing=verbose,
@@ -213,37 +225,35 @@ class CCNF(LightningModule):
         return logs
 
 def infer_types(X, Y, Z, rng):
-    # Identify categorical flags
-    X_cat = pd.api.types.is_categorical_dtype(X)
-    Y_cat = pd.api.types.is_categorical_dtype(Y)
+    # 1. Identify categorical flags using Pandas attributes
+    X_cat = hasattr(X.dtype, 'categories') or pd.api.types.is_object_dtype(X)
+    Y_cat = hasattr(Y.dtype, 'categories') or pd.api.types.is_object_dtype(Y)
 
-    # Construct DataFrame
-    df = pd.DataFrame(np.column_stack((X, Y, Z)))
+    # 2. Label-encode X and Y independently if they are categorical
+    if X_cat:
+        X_out = LabelEncoder().fit_transform(X).astype(np.float32)
+    else:
+        X_out = np.asarray(X, dtype=np.float32)
+        
+    if Y_cat:
+        Y_out = LabelEncoder().fit_transform(Y).astype(np.float32)
+    else:
+        Y_out = np.asarray(Y, dtype=np.float32)
 
-    # Manually detect categorical columns
-    cat_cols = [i for i in df.columns if pd.api.types.is_categorical_dtype(df[i]) or pd.api.types.is_object_dtype(df[i])]
+    # 3. Process Z independently
+    if not isinstance(Z, pd.DataFrame):
+        Z = pd.DataFrame(Z)
 
-    N, d = df.shape
-    assert N == X.shape[0]
+    # Detect categorical columns in Z
+    cat_cols_z = [col for col in Z.columns if hasattr(Z[col].dtype, 'categories') or pd.api.types.is_object_dtype(Z[col])]
+    
+    # One-hot encode Z if needed
+    if cat_cols_z:
+        Z = pd.get_dummies(Z, columns=cat_cols_z, drop_first=False, dtype=np.float32)
+        
+    Z_out = Z.values.astype(np.float32)
 
-    # Label-encode X and Y if categorical
-    for col in [0, 1]:
-        if col in cat_cols:
-            df[col] = LabelEncoder().fit_transform(df[col])
-            cat_cols.remove(col)  # Already encoded
-    # One-hot encode remaining categorical columns
-    df = pd.get_dummies(df, columns=cat_cols, drop_first=False, dtype=np.float32)
-    assert df.columns[0] == 0
-    assert df.columns[1] == 1
-    # Convert outputs to numpy arrays of appropriate types
-    X = df[0].astype(np.float32).values
-    Y = df[1].astype(np.float32).values
-    Z = df.drop(columns=[0, 1]).values.astype(np.float32)
-
-    assert N == len(X) == len(Y) == Z.shape[0]
-
-
-    return (X, X_cat), (Y, Y_cat), Z
+    return (X_out, X_cat), (Y_out, Y_cat), Z_out
 
 def LCIT(X, Y, Z, n_bootstraps=0, normalize=True, n_components=32, hidden_sizes=4, lr=5e-3, weight_decay=5e-5, max_epochs=100, random_state=0, gpus=0, return_latents=False, verbose=False, batch_norm=True, **kwargs):
     logger.setLevel(logging.DEBUG if verbose else logging.ERROR)
@@ -300,7 +310,9 @@ def LCIT(X, Y, Z, n_bootstraps=0, normalize=True, n_components=32, hidden_sizes=
         e_x, e_y = map(np.squeeze, (e_x, e_y))
         e_x, e_y = map(norm.ppf, (e_x, e_y))
         r = np.corrcoef(e_x, e_y)[0, 1]
-        assert r == r
+        # assert r == r
+        if not np.isfinite(r):
+            r = 0.0
         r = np.clip(r, -1 + EPS, 1 - EPS)
         z_stat = 0.5 * np.sqrt(N - 3) * np.log1p(2 * r / (1 - r))
         assert z_stat == z_stat

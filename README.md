@@ -88,17 +88,21 @@ The experiments involve several libraries that may have conflicting dependencies
 pip install JPype1
 pip install git+https://github.com/cmu-phil/py-tetrad@56dd9ec5e0e97230ed037f2c61dd9364e978197a
 ```
-* For CGIT [4] (R) -> bnlearn (Currently version 5.1).
+* For CGIT [4] (R) -> bnlearn (Currently version 5.2.1).
 ```r
 install.packages("bnlearn")
 ```
-* For MMCIT [5] (R) -> MXM 1.5.5 - Deprecated in CRAN, provided in this repo as a compressed file with minor changes. Original package [here](https://cran.r-project.org/src/contrib/Archive/MXM/).
+* For MMCIT [5] (R) -> MXM 1.5.8 - Deprecated in CRAN, but available in archive. Original package [here](https://cran.r-project.org/src/contrib/Archive/MXM/).
 ```r
-install.packages("./external/MXM/MXM_1.5.5.tar.gz", repos = NULL, type="source")
+install.packages(
+  "https://cran.r-project.org/src/contrib/Archive/MXM/MXM_1.5.8.tar.gz",
+  repos = NULL,
+  type = "source"
+)
 ```
 * For MRCIT [6] (Python/R) -> Essential files and dependencies in ./external/AAAI2022_HCM/, install as explained in their [README.md](/external/AAAI2022_HCM/README.md). Original repository [here](https://github.com/DAMO-DI-ML/AAAI2022-HCM).
 ```r
-install.packages("/ossfs/workspace/pai-algo-dev/momentchi2_0.1.5.tar", repos=NULL, type="source")
+install.packages("momentchi2")
 ```
 ```python
 cd external/AAAI2022_HCM/
@@ -115,6 +119,25 @@ pip install requirements.txt
 pip install numpy pandas scikit-learn scipy torch==1.12 pytorch-lightning==1.5.3
 ```
 
+* For CCI [8] (R) -> CCI (Currently version 0.3.7).
+```r
+install.packages("CCI")
+```
+
+* For aHist $\chi^{2}$ [9] (R) -> Essential files and dependencies in ./external/CMI-adaptive-hist/. Original repository [here](https://github.com/ylincen/CMI-adaptive-hist).
+```r
+install.packages(c("MASS","dplyr"))
+install.packages(
+  "https://cran.r-project.org/src/contrib/Archive/SCCI/SCCI_1.2.tar.gz",
+  repos = NULL, type = "source"
+)
+```
+
+* For CIml [10] and Pillai [11] (Python) -> Essential files and dependencies in ./external/CIml/. Original repository [here](https://github.com/mensxmachina/CIml).
+```python
+pip install numpy pandas scikit-learn scipy xgboost
+```
+
 * Additionally, the experiments have dependencies that must be installed:
 ```python
 pip install -r requirements.txt
@@ -123,7 +146,7 @@ pip install -r requirements.txt
 The recommended and working environments for the experiments in the paper have been: 
 * A single Python 3.10.0 installation for executing LCIT + PyTorch.
 * A second Python 3.13.5 installation for everything else.
-* R version 4.5.1 and latest Java LTS release JDK-25.
+* R version 4.5.1 and Java LTS release JDK-25.
 
 ### Dataset availability
 Although all datasets are either publicly available or reproducible, we provide all the experimental data and learned models as they may take some time to be generated. They can be downloaded as a .zip file [here](https://cig.fi.upm.es/wp-content/uploads/experiments.zip), and must be decompressed under the [experiments/](/experiments) directory of this project.
@@ -142,8 +165,8 @@ For additional modules under the /external/ directory - see the THIRD_PARTY_LICE
 ## Acknowledgments
 
 The experiments in this repository were inspired by: 
-* [mCMIkNN](https://github.com/hpi-epic/mCMIkNN) [8]
-* [HSPBNs](https://github.com/davenza/HSPBN-Experiments) [9]
+* [mCMIkNN](https://github.com/hpi-epic/mCMIkNN) [12]
+* [HSPBNs](https://github.com/davenza/HSPBN-Experiments) [13]
 
 Additionally, this repository extends the PyBNesian implementation in [https://repo.hca.bsc.es/gitlab/aingura-public/pybnesian.git](https://repo.hca.bsc.es/gitlab/aingura-public/pybnesian.git), with authors:
 
@@ -152,7 +175,7 @@ Additionally, this repository extends the PyBNesian implementation in [https://r
     - Filippo Mantovani filippo.mantovani@bsc.es
     - Javier Diaz jdiaz@ainguraiiot.com
 
-Being all extensions of the original work [10] (https://github.com/davenza/PyBNesian) authored by:
+Being all extensions of the original work [14] (https://github.com/davenza/PyBNesian) authored by:
 
     - David Atienza datienza@fi.upm.es
 
@@ -172,8 +195,28 @@ Being all extensions of the original work [10] (https://github.com/davenza/PyBNe
 
 [7] B. Duong, T. Nguyen. Normalizing flows for conditional independence testing. *Knowledge and Information Systems*, vol. 66, no. 1, pp. 357–380, 2024.
 
-[8] J. Huegle, C. Hagedorn, R. Schlosser. A kNN-Based non-parametric conditional independence test for mixed data and application in causal discovery. In *Machine Learning and Knowledge Discovery in Databases: Research Track*, Springer, pp. 541–558, 2023.
+[8] C. B. H. Thorjussen, K. H. Liland, I. Måge, L. E. Solberg. Computa-
+tional test for conditional independence, *Algorithms* 17 (8) (2024).
 
-[9] D. Atienza, P. Larrañaga, C. Bielza. Hybrid semiparametric Bayesian networks. *TEST*, vol. 31, no. 2, pp. 299–327, 2022.
+[9] A. Marx, L. Yang, M. Van Leeuwen. Estimating conditional mutual
+information for discrete-continuous mixtures using multi-dimensional
+adaptive histograms, in: *Proceedings of the 2021 SIAM International
+Conference on Data Mining*, Society for Industrial and Applied Mathe-
+matics, 2021, pp. 387–395.
 
-[10]  D. Atienza, C. Bielza, P. Larrañaga. PyBNesian: An extensible python package for Bayesian networks. *Neurocomputing*, vol. 504, pp. 204–209, 2022.
+[10] K. Biza, S. Triantafillou, I. Tsamardinos. Conditional independence testing with tuning: An approach based on predictive performance, in:
+*Artificial Intelligence Applications and Innovations*, Springer Nature
+Switzerland, 2026, pp. 63–81.
+
+[11] A. Ankan, J. Textor. A simple unified approach to testing high-
+dimensional conditional independences for categorical and ordinal data,
+in: *Proceedings of the 37th AAAI Conference on Artificial Intelligence
+and 35th Conference on Innovative Applications of Artificial Intelligence
+and 13th Symposium on Educational Advances in Artificial Intelligence*,
+AAAI Press, 2023, p. 1367.
+
+[12] J. Huegle, C. Hagedorn, R. Schlosser. A kNN-Based non-parametric conditional independence test for mixed data and application in causal discovery. In *Machine Learning and Knowledge Discovery in Databases: Research Track*, Springer, pp. 541–558, 2023.
+
+[13] D. Atienza, P. Larrañaga, C. Bielza. Hybrid semiparametric Bayesian networks. *TEST*, vol. 31, no. 2, pp. 299–327, 2022.
+
+[14]  D. Atienza, C. Bielza, P. Larrañaga. PyBNesian: An extensible python package for Bayesian networks. *Neurocomputing*, vol. 504, pp. 204–209, 2022.

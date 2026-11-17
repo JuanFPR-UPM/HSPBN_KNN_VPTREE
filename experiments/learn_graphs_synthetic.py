@@ -8,11 +8,11 @@ import pandas as pd
 import pickle
 import pybnesian as pbn
 from functools import partial
-# from adapted_MMCIT import MMCIT
-# from adapted_CGIT import CGIT
-# from adapted_DGCIT import DGCIT
-# from adapted_LCIT import Adapted_LCIT
-# from adapted_MRCIT import MRCIT
+from adapted_MMCIT import MMCIT
+from adapted_CGIT import CGIT
+from adapted_DGCIT import DGCIT
+from adapted_LCIT import Adapted_LCIT
+from adapted_MRCIT import MRCIT
 from adapted_Pillai import Pillai
 from adapted_CIml import Adapted_CIml
 from adapted_CCI import CCI
@@ -99,22 +99,22 @@ def preprocess_dataset(filename):
     return df, node_children_blacklist
 
 indep_test_dict = {
-    # 'knncit': partial(
-    #     pbn.MixedKMutualInformation,
-    #     shuffle_neighbors=5,
-    #     samples=100,
-    #     scaling="normalized_rank",
-    #     gamma_approx=True,
-    #     adaptive_k=True
-    # ),
-    # 'mrcit': partial(MRCIT, num_f2=20),
-    # 'cgit': CGIT,
-    # 'dgcit': DGCIT,
-    # 'mmcit': MMCIT,
+    'knncit': partial(
+        pbn.MixedKMutualInformation,
+        shuffle_neighbors=5,
+        samples=100,
+        scaling="normalized_rank",
+        gamma_approx=True,
+        adaptive_k=True
+    ),
+    'mrcit': partial(MRCIT, num_f2=20),
+    'cgit': CGIT,
+    'dgcit': DGCIT,
+    'mmcit': MMCIT,
     'pillai':Pillai,
     'ciml':Adapted_CIml,
     'cci':partial(CCI, nperm=200),
-    # 'lcit': partial(Adapted_LCIT, n_components=32, hidden_sizes=[4]),
+    'lcit': partial(Adapted_LCIT, n_components=32, hidden_sizes=[4]),
 }
 
 def learn_bn_hillclimbing(filename, counter):
@@ -168,8 +168,6 @@ filenames = sorted(
 random.shuffle(filenames)
 
 for i, filename in enumerate(filenames):
-    # learn_bn_hillclimbing(os.fsdecode(filename), i)
-    # if os.fsdecode(filename).split('_')[5].split('.')[0] != '3000':
-    #     continue
+    learn_bn_hillclimbing(os.fsdecode(filename), i)
     learn_pdags_pc(os.fsdecode(filename), i)
 

@@ -5,7 +5,6 @@
 import warnings
 warnings.filterwarnings("ignore")
 import os
-os.environ["OMP_NUM_THREADS"] = '1'
 import pandas as pd
 import numpy as np
 import pickle
@@ -15,6 +14,9 @@ from adapted_MMCIT import MMCIT
 from adapted_CGIT import CGIT
 from adapted_DGCIT import DGCIT
 from adapted_MRCIT import MRCIT
+from adapted_Pillai import Pillai
+from adapted_CIml import Adapted_CIml
+from adapted_CCI import CCI
 from sklearn.preprocessing import LabelEncoder
 
 
@@ -50,6 +52,21 @@ except:
 
 try:
     os.mkdir('./results/real/dgcit')
+except:
+    pass
+
+try:
+    os.mkdir('./results/real/pillai')
+except:
+    pass
+
+try:
+    os.mkdir('./results/real/ciml')
+except:
+    pass
+
+try:
+    os.mkdir('./results/real/cci')
 except:
     pass
 
@@ -99,7 +116,10 @@ indep_test_dict = {
     ),
     'cgit': CGIT,
     'dgcit': DGCIT,
-    'mmcit': MMCIT
+    'mmcit': MMCIT,
+    'pillai':Pillai,
+    'ciml':Adapted_CIml,
+    'cci':partial(CCI, nperm=200),
 }
 
 

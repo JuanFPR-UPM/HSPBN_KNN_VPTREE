@@ -14,6 +14,9 @@ methodLocDict = {
                 '$MMCIT$': ['./results/synthetic/mmcit/', './results/synthetic/mmcit/hspbns/'],
                  '$CGIT$': ['./results/synthetic/cgit/', './results/synthetic/cgit/hspbns/'],
                  '$DGCIT$': ['./results/synthetic/dgcit/', './results/synthetic/dgcit/hspbns/'],
+                 '$CCI$': ['./results/synthetic/cci/', './results/synthetic/cci/hspbns/'],
+                 '$CIml$': ['./results/synthetic/ciml/', './results/synthetic/ciml/hspbns/'],
+                 '$Pillai$': ['./results/synthetic/pillai/', './results/synthetic/pillai/hspbns/'],
                 }
 
 groundTruthLoc = './hspbns/'
@@ -41,6 +44,21 @@ except:
 
 try:
     os.mkdir('./results/synthetic/dgcit/hspbns/')
+except:
+    pass
+
+try:
+    os.mkdir('./results/synthetic/cci/hspbns/')
+except:
+    pass
+
+try:
+    os.mkdir('./results/synthetic/ciml/hspbns/')
+except:
+    pass
+
+try:
+    os.mkdir('./results/synthetic/pillai/hspbns/')
 except:
     pass
 
@@ -119,6 +137,7 @@ for graphFile in sorted(os.listdir(groundTruthLoc))[:]:
                 try:
                     learned_spbn = find_pdag_nodetypes_topological(learned_graph, df, node_children_blacklist)
                 except ValueError as e:
+                    print(e)
                     continue
                 print(method)
                 learned_spbn.save(methodLocDict[method][1]+ graphFile[:-4]+ '_' + samples, True)
