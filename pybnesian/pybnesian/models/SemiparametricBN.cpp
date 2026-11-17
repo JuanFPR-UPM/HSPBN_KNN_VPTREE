@@ -4,7 +4,7 @@
 #include <learning/operators/operators.hpp>
 
 using graph::DirectedGraph;
-using learning::operators::Operator, learning::operators::AddArc, learning::operators::ChangeNodeType,
+using learning::operators::Operator, learning::operators::FlipArc, learning::operators::ChangeNodeType,
     learning::operators::OperatorPool, learning::operators::OperatorSet, learning::operators::ChangeNodeTypeSet,
     learning::operators::ArcOperatorSet;
 using learning::scores::Score;
@@ -63,16 +63,23 @@ const std::string select_best_arc_orientation(OperatorPool& op_pool,
     double arc2_delta = arc_deltas(node2_idx, node1_idx);
     auto source = node1;
     auto dest = node2;
-    if ((arc1_delta < arc2_delta && spbn->graph().can_add_arc(dest, source)) || !spbn->graph().can_add_arc(source, dest)) {
-        std::swap(source, dest);
-        std::swap(arc1_delta, arc2_delta);
+
+    bool can_sd = spbn->graph().can_add_arc(source, dest);
+    bool can_ds = spbn->graph().can_add_arc(dest, source);
+
+    if (!can_sd && !can_ds) {
+        // Neither direction is valid — skip and delete edge
+        return dest;
     }
 
-    auto op_arc = AddArc(source, dest, arc1_delta);
-    op_arc.apply(*spbn);
-    auto nodes_changed = op_arc.nodes_changed(*spbn);
-    op_pool.update_scores(*spbn, score, nodes_changed);
-    return dest;
+    if (can_ds && (!can_sd || arc2_delta > arc1_delta)) {
+        auto op_arc = FlipArc(source, dest, arc1_delta);
+        op_arc.apply(*spbn);
+        auto nodes_changed = op_arc.nodes_changed(*spbn);
+        op_pool.update_scores(*spbn, score, nodes_changed);
+    }
+
+    return source;
 }
 std::shared_ptr<BayesianNetworkBase> SemiparametricBNType::spbn_from_pdag(const DataFrame& df,
                                                                           PartiallyDirectedGraph& pdag,
@@ -176,11 +183,14 @@ std::shared_ptr<BayesianNetworkBase> SemiparametricBNType::spbn_from_pdag(const 
     }
 
     // directed is DAG now, with topological sort equal to top_sort
-
     for (const auto& arc : directed.arcs()) {
-        spbn->add_arc(arc.first, arc.second);
+        if (spbn->graph().can_add_arc(arc.first, arc.second))
+        {
+            spbn->add_arc(arc.first, arc.second);
+        }
+        
     }
-
+    
     std::vector<std::string> explored;
 
     std::vector<std::shared_ptr<OperatorSet>> ops;
