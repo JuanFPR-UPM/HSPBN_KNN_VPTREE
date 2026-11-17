@@ -5,9 +5,10 @@ Each component retains its original copyright and license.
 
 | Component | Location | License | Author(s) / Source |
 | --- | --- | --- | --- |
-| MRCIT | `/external/AAAI2022_HCM` | MIT | Yan Li, Rui Xia, Chunchen Liu, and Liang Sun / [GitHub](https://github.com/DAMO-DI-ML/AAAI2022-HCM) |
+| MRCIT | `/external/AAAI2022_HCM` | MIT | Yan Li, Rui Xia, Chunchen Liu and Liang Sun / [GitHub](https://github.com/DAMO-DI-ML/AAAI2022-HCM) |
 | CMIknnMixed | `/external/cmiknnmixed` | GPL-3 | Oana-Iuliana Popescu, Andreas Gerhardus, Martin Rabel and Jakob Runge / [GitHub](https://github.com/oanaipopescu/cmiknnmixed) |
-| CIml | `/external/CIml` | MIT | Konstantina Biza, Sofia Triantafillou, and Ioannis Tsamardinos / [GitHub](https://github.com/mensxmachina/CIml) |
+| CIml | `/external/CIml` | MIT | Konstantina Biza, Sofia Triantafillou and Ioannis Tsamardinos / [GitHub](https://github.com/mensxmachina/CIml) |
 | Pillai trace | `/external/CIml` | MIT | Ankur Ankan and Johannes Textor / [GitHub](https://github.com/pgmpy/pgmpy) |
+| aHist $\chi^{2}$ | `/external/CMI-adaptive-hist` | MIT | Alexander Marx, Lincen Yang and Matthijs van Leeuwen / [GitHub](https://github.com/ylincen/CMI-adaptive-hist) |
 
 Full license texts for each dependency are provided in each `/external/<library>/`.
