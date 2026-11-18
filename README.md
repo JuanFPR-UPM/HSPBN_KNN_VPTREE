@@ -198,22 +198,11 @@ Being all extensions of the original work [14] (https://github.com/davenza/PyBNe
 [8] C. B. H. Thorjussen, K. H. Liland, I. Måge, L. E. Solberg. Computa-
 tional test for conditional independence, *Algorithms* 17 (8) (2024).
 
-[9] A. Marx, L. Yang, M. Van Leeuwen. Estimating conditional mutual
-information for discrete-continuous mixtures using multi-dimensional
-adaptive histograms, in: *Proceedings of the 2021 SIAM International
-Conference on Data Mining*, Society for Industrial and Applied Mathe-
-matics, 2021, pp. 387–395.
+[9] A. Marx, L. Yang, M. Van Leeuwen. Estimating conditional mutual information for discrete-continuous mixtures using multi-dimensional adaptive histograms, in: *Proceedings of the 2021 SIAM International Conference on Data Mining*, Society for Industrial and Applied Mathematics, 2021, pp. 387–395.
 
-[10] K. Biza, S. Triantafillou, I. Tsamardinos. Conditional independence testing with tuning: An approach based on predictive performance, in:
-*Artificial Intelligence Applications and Innovations*, Springer Nature
-Switzerland, 2026, pp. 63–81.
+[10] K. Biza, S. Triantafillou, I. Tsamardinos. Conditional independence testing with tuning: An approach based on predictive performance, in: *Artificial Intelligence Applications and Innovations*, Springer Nature Switzerland, 2026, pp. 63–81.
 
-[11] A. Ankan, J. Textor. A simple unified approach to testing high-
-dimensional conditional independences for categorical and ordinal data,
-in: *Proceedings of the 37th AAAI Conference on Artificial Intelligence
-and 35th Conference on Innovative Applications of Artificial Intelligence
-and 13th Symposium on Educational Advances in Artificial Intelligence*,
-AAAI Press, 2023, p. 1367.
+[11] A. Ankan, J. Textor. A simple unified approach to testing high-dimensional conditional independences for categorical and ordinal data, in: *Proceedings of the 37th AAAI Conference on Artificial Intelligence*, AAAI Press, 2023, p. 1367.
 
 [12] J. Huegle, C. Hagedorn, R. Schlosser. A kNN-Based non-parametric conditional independence test for mixed data and application in causal discovery. In *Machine Learning and Knowledge Discovery in Databases: Research Track*, Springer, pp. 541–558, 2023.
 
