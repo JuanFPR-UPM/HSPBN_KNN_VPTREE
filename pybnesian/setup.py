@@ -356,9 +356,8 @@ class BuildExt(build_ext):
         for ext in self.extensions:
             ext.define_macros.append(("PYARROW_VERSION_INFO", pa.__version__))
 
-        # The compiled extension depends on a specific version of pyarrow.
+        # # The compiled extension depends on a specific version of pyarrow.
         self.distribution.install_requires = ['pybind11>=2.6', 'pyarrow=='+pa.__version__, "numpy"],
-        self.distribution.setup_requires = ['pybind11>=2.6', 'pyarrow=='+pa.__version__, "numpy"],
 
         # Activate debug mode.
         # opts.append("-UNDEBUG")
@@ -409,7 +408,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 
 from pybind11.setup_helpers import ParallelCompile, naive_recompile
-os.environ.setdefault("NPY_NUM_BUILD_JOBS", f"{int(os.environ.get("NPY_NUM_BUILD_JOBS", max(1, os.cpu_count() // 2)))}")
+os.environ.setdefault("NPY_NUM_BUILD_JOBS", f"{int(os.environ.get('NPY_NUM_BUILD_JOBS', max(1, os.cpu_count() // 2)))}")
 ParallelCompile("NPY_NUM_BUILD_JOBS", needs_recompile=naive_recompile).install()
 
 
@@ -433,7 +432,6 @@ setup(
     packages=['pybnesian'],
     ext_modules=ext_modules,
     libraries=ext_libraries,
-    setup_requires=['pybind11>=2.6', 'pyarrow>=3.0', "numpy"],
     install_requires=['pybind11>=2.6', 'pyarrow>=3.0', "numpy"],
     cmdclass={'build_clib': Build_CMakeExternalLibrary, 'build_ext': BuildExt},
     license="MIT",
