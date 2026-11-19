@@ -118,7 +118,11 @@ ext_libraries = [('fort', {
                ('nlopt', {
                    'sources': [],
                 #    Static linking using -DBUILD_SHARED_LIBS=OFF
-                   'cmake_config': CMakeExternalLibrary(os.path.join('lib', 'nlopt-2.7.0'), ["-DBUILD_SHARED_LIBS=OFF"])
+                   'cmake_config': CMakeExternalLibrary(os.path.join('lib', 'nlopt-2.7.0'), [
+                                                                                            "-DBUILD_SHARED_LIBS=OFF",
+                                                                                            "-DNLOPT_TESTS=OFF",
+                                                                                            "-DBUILD_TESTING=OFF",
+                                                                                            ])
                 })
 ]
 
